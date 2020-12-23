@@ -25,7 +25,7 @@ class AlbumListView(View):
             filter_set['release_date__year'] = int(request.GET['year'])  
 
         search_string = request.GET.get('search')
-        search_key    = request.GET.get('search_key')
+        search_key    = request.GET.get('search_key',0)
         search_option = {
             0 : Q(title__icontains=search_string) | Q(description__icontains=search_string),
             1 : Q(title__icontains=search_string),
@@ -33,9 +33,7 @@ class AlbumListView(View):
         }
 
         if search_string:
-            if not search_key:
-                search_key = 0
-            query &= search_option[search_key]
+            query &= search_option[int(search_key)]
             
         
         albums = Album.objects.select_related('genre','release_type').prefetch_related('artist').filter(query,**filter_set)
